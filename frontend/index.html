@@ -2,57 +2,96 @@
 <html>
 <head>
   <title>Mundial Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: Arial; background:#111; color:white; padding:20px">
 
-<h1>🏆 Predicción Mundial</h1>
+<body style="
+  margin:0;
+  font-family: Arial;
+  background: radial-gradient(circle, #333, #111);
+  color:white;
+  padding:20px;
+">
 
-<input id="name" placeholder="Tu nombre"><br><br>
+<h1 style="font-size:22px;">🏆 PREDICCIÓN MUNDIALERA</h1>
 
-<input id="champion" placeholder="Campeón"><br><br>
-<input id="topScorer" placeholder="Goleador"><br><br>
-<input id="bestPlayer" placeholder="Mejor jugador"><br><br>
+<input id="name" placeholder="Tu nombre" style="width:100%; padding:10px; margin-bottom:20px;">
 
-<button onclick="save()">Guardar</button>
+<div id="form"></div>
 
-<h2>Ranking</h2>
-<button onclick="calculate()">Ver ranking</button>
+<button onclick="save()" style="width:100%; padding:15px; background:#00c853; border:none; color:white;">
+Guardar predicción
+</button>
+
+<h2>🏆 Ranking</h2>
+<button onclick="ranking()" style="width:100%; padding:10px;">Ver resultados</button>
 
 <div id="ranking"></div>
 
 <script>
 const API = "https://prediccion-mundialera-2026.onrender.com";
 
+const fields = [
+  {key:"champion", label:"Campeón", color:"#76ff03"},
+  {key:"disappointment", label:"Decepción", color:"#00e5ff"},
+  {key:"surprise", label:"Sorpresa", color:"#ff1744"},
+  {key:"revelation", label:"Jugador Revelación", color:"#ff9100"},
+  {key:"playerDisappointment", label:"Jugador Decepción", color:"#d500f9"},
+  {key:"topScorer", label:"Goleador", color:"#2979ff"},
+  {key:"bestPlayer", label:"Mejor Jugador", color:"#00e676"}
+];
+
+const formDiv = document.getElementById("form");
+
+fields.forEach(f => {
+  formDiv.innerHTML += `
+    <div style="display:flex; margin-bottom:10px;">
+      <div style="background:${f.color}; padding:10px; width:50%;">
+        ${f.label}
+      </div>
+      <input id="${f.key}" style="width:50%; padding:10px;">
+    </div>
+  `;
+});
+
 async function save() {
   await fetch(API + "/prediction", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
       name: document.getElementById("name").value,
-      champion: document.getElementById("champion").value,
-      topScorer: document.getElementById("topScorer").value,
-      bestPlayer: document.getElementById("bestPlayer").value
+      champion: champion.value,
+      disappointment: disappointment.value,
+      surprise: surprise.value,
+      revelation: revelation.value,
+      playerDisappointment: playerDisappointment.value,
+      topScorer: topScorer.value,
+      bestPlayer: bestPlayer.value
     })
   });
 
-  alert("Guardado!");
+  alert("✅ Guardado!");
 }
 
-async function calculate() {
-  const res = await fetch(API + "/calculate", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
+async function ranking(){
+  const res = await fetch(API + "/ranking", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
-      champion: "Argentina",
-      topScorer: "Mbappe",
-      bestPlayer: "Messi"
+      champion:"Argentina",
+      topScorer:"Mbappe",
+      bestPlayer:"Messi",
+      surprise:"Marruecos",
+      disappointment:"Brasil",
+      revelation:"Bellingham",
+      playerDisappointment:"Neymar"
     })
   });
 
   const data = await res.json();
 
   document.getElementById("ranking").innerHTML =
-    data.map(r => `<p>${r.name} - ${r.score}</p>`).join("");
+    data.map((r,i)=>`<p>${i+1}. ${r.name} - ${r.score} pts</p>`).join("");
 }
 </script>
 
