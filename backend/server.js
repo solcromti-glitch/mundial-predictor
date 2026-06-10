@@ -7,32 +7,47 @@ app.use(express.json());
 
 let predictions = [];
 
+// Guardar predicción
 app.post("/prediction", (req, res) => {
-  predictions.push(req.body);
+  const pred = req.body;
+  predictions.push(pred);
   res.send({ ok: true });
 });
 
+// Obtener todas
 app.get("/predictions", (req, res) => {
   res.send(predictions);
 });
 
-app.post("/calculate", (req, res) => {
+// Calcular ranking
+app.post("/ranking", (req, res) => {
   const results = req.body;
+
+  const scoring = {
+    champion: 10,
+    topScorer: 8,
+    bestPlayer: 8,
+    surprise: 6,
+    disappointment: 6,
+    revelation: 5,
+    playerDisappointment: 5
+  };
 
   const ranking = predictions.map(p => {
     let score = 0;
 
-    if (p.champion === results.champion) score += 10;
-    if (p.topScorer === results.topScorer) score += 8;
-    if (p.bestPlayer === results.bestPlayer) score += 8;
+    for (let key in scoring) {
+      if (p[key] === results[key]) {
+        score += scoring[key];
+      }
+    }
 
     return { name: p.name, score };
   });
 
   ranking.sort((a, b) => b.score - a.score);
-
   res.send(ranking);
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log("Servidor listo 🚀"));
+app.listen(PORT, () => console.log("Backend listo 🚀"));
