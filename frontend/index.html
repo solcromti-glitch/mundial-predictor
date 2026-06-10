@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mundial Predictor</title>
+</head>
+<body style="font-family: Arial; background:#111; color:white; padding:20px">
+
+<h1>🏆 Predicción Mundial</h1>
+
+<input id="name" placeholder="Tu nombre"><br><br>
+
+<input id="champion" placeholder="Campeón"><br><br>
+<input id="topScorer" placeholder="Goleador"><br><br>
+<input id="bestPlayer" placeholder="Mejor jugador"><br><br>
+
+<button onclick="save()">Guardar</button>
+
+<h2>Ranking</h2>
+<button onclick="calculate()">Ver ranking</button>
+
+<div id="ranking"></div>
+
+<script>
+const API = "TU_BACKEND_URL_AQUI";
+
+async function save() {
+  await fetch(API + "/prediction", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: document.getElementById("name").value,
+      champion: document.getElementById("champion").value,
+      topScorer: document.getElementById("topScorer").value,
+      bestPlayer: document.getElementById("bestPlayer").value
+    })
+  });
+
+  alert("Guardado!");
+}
+
+async function calculate() {
+  const res = await fetch(API + "/calculate", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      champion: "Argentina",
+      topScorer: "Mbappe",
+      bestPlayer: "Messi"
+    })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("ranking").innerHTML =
+    data.map(r => `<p>${r.name} - ${r.score}</p>`).join("");
+}
+</script>
+
+</body>
+</html>
